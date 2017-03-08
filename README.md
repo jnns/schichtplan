@@ -6,7 +6,7 @@ This script copies schedules from an old MS Access `mdb` file to a Discourse ins
 
 Install mdbtools and sqlite3
 
-	apt install mdbtools sqlite3
+    apt install mdbtools sqlite3
 
 Add German locale for proper date formatting
 
@@ -35,5 +35,15 @@ Add the script to `cron`
 
 Update the API_KEY and POST_ID in `import.sh` and then run the script:
 
-	$ chmod +x import.sh
+    $ chmod +x import.sh
     $ ./import.sh
+    
+To automatically update the database file on the server, download WinSCP and 
+create a batch file with the following contents:
+
+    open sftp://server -hostkey="ssh-ed25519 256 de:d1:95:54:ae:ef:01:30:cc:72:c9:54:f1:0e:d2:c9"
+    put C:\Indoorclimbing\Kurs.mdb /var/schichtplan/mdb/Kurs.mdb
+    exit
+
+    
+    
