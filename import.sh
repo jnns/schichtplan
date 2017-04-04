@@ -2,7 +2,7 @@
 
 # Configuration
 API_USER=system
-API_KEY=
+API_KEY=d0ac9e1fb86ff9ec98234ee9434814483191cc7a6b754b1f1f368f0111bcd6ef 
 
 MSACCESS_DATABASE='mdb/Kurs.mdb'
 SQLITE_DATABASE='data.sqlite'
@@ -49,31 +49,22 @@ echo -e "${GREEN}Importing table Ereignis${NC}"
 sqlite3 $SQLITE_DATABASE < sql/Ereignis.sql
 
 
-echo -e "${GREEN}Generate output for Kurse${NC}"
+echo -e "${GREEN}Generate HTML output via SQLite${NC}"
 sqlite3 -batch $SQLITE_DATABASE <<- EOF
 .mode html
-.output kurse.output.html
-.read kurse.sql
+.output output.html
+.read schichtplan.sql
 EOF
 
-echo -e "${GREEN}Generate output for Bardienst${NC}"
-sqlite3 -batch $SQLITE_DATABASE <<- EOF
-.mode html
-.output bardienst.output.html
-.read bardienst.sql
-EOF
 
-echo -e "${GREEN}Modifying output${NC}"
+echo -e "${GREEN}Render output through template.html${NC}"
 PAYLOAD=payload.html
 
 # Render HTML table
-sed '/\${table_content_kurse}/{r kurse.output.html
-    d;};
-    /\${table_content_bardienst}/{r bardienst.output.html
+# The newline is very important here!
+sed '/\${table_content}/{r output.html
     d;}' template.html > $PAYLOAD
 
-rm kurse.output.html
-rm bardienst.output.html
 
 # Add timestamp to payload
 sed -i "s@<!-- timestamp -->@$DATE@" $PAYLOAD
@@ -88,6 +79,7 @@ curl -X PUT -F api_username=$API_USER \
   https://intern.ostbloc.de/posts/$POST_ID
 
 echo -e "${GREEN}Cleaning up${NC}"
+rm output.html
 rm $PAYLOAD
 rm $SQLITE_DATABASE
 
