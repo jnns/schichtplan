@@ -4,8 +4,13 @@
 API_USER=system
 API_KEY=d0ac9e1fb86ff9ec98234ee9434814483191cc7a6b754b1f1f368f0111bcd6ef 
 
+# Discourse post id to update
+POST_ID=81
+
 MSACCESS_DATABASE='mdb/Kurs.mdb'
 SQLITE_DATABASE='data.sqlite'
+SQLITE_OUTPUT='output.csv'
+PAYLOAD=payload.html
 
 TZ="Europe/Berlin"
 LANG="de_DE.UTF-8"
@@ -51,26 +56,25 @@ sqlite3 $SQLITE_DATABASE < sql/Ereignis.sql
 
 echo -e "${GREEN}Generate HTML output via SQLite${NC}"
 sqlite3 -batch $SQLITE_DATABASE <<- EOF
-.mode html
-.output output.html
+.mode tabs
+.output $SQLITE_OUTPUT
 .read schichtplan.sql
 EOF
 
 
 echo -e "${GREEN}Render output through template.html${NC}"
-PAYLOAD=payload.html
 
-# Render HTML table
+# Render template
+/var/schichtplan/.venv/bin/python render.py > $PAYLOAD
+
 # The newline is very important here!
-sed '/\${table_content}/{r output.html
-    d;}' template.html > $PAYLOAD
+#sed '/\${table_content}/{r $SQLITE_OUTPUT
+#    d;}' template.html > $PAYLOAD
 
 
 # Add timestamp to payload
 sed -i "s@<!-- timestamp -->@$DATE@" $PAYLOAD
 
-# Update posting on Discourse
-POST_ID=81
 
 echo -e "${GREEN}Delivering payload${NC}"
 curl -X PUT -F api_username=$API_USER \
@@ -79,8 +83,9 @@ curl -X PUT -F api_username=$API_USER \
   https://intern.ostbloc.de/posts/$POST_ID
 
 echo -e "${GREEN}Cleaning up${NC}"
-rm output.html
+rm $SQLITE_OUTPUT
 rm $PAYLOAD
 rm $SQLITE_DATABASE
+rm sql/*  # remove generated sql dumps
 
 echo -e "${GREEN}Done${NC}"

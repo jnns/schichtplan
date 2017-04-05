@@ -1,24 +1,77 @@
-Hier befindet sich eine Kopie des Schichtplans, so wie er stündlich aus der Software des Kassenrechners ausgelesen wird.
+Hier befindet sich eine Kopie des Schichtplans, so wie er stündlich aus der
+Software des Kassenrechners ausgelesen wird.
 
 Letzte Aktualisierung: <!-- timestamp -->
 
+{% set last_date = None %}
+{% set last_time = None %}
+{% set last_extra_time = None %}
+{% set last_person = None %}
+
 <table>
-	<thead>
-	<tr>
-		<th>Datum</th>
-		<th>Tresen</th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th>Kurs</th>
-		<th></th>
-		<th></th>
-		<th></th>
-	</tr>
-	</thead>
-	<tbody>
-		${table_content}
-	</tbody>
+    <thead>
+    <tr>
+        <th>Datum</th>
+        <th>Tresen</th>
+        <th></th>
+        <th></th>
+        <th>Kurs</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in rows %}
+        <tr>
+            <td>
+            {% if last_date is none or last_date != row.date %}
+                {% set last_date = row.date %}
+                {% if row.day == "0" %}So
+		{% elif row.day == "1" %}Mo
+		{% elif row.day == "2" %}Di
+		{% elif row.day == "3" %}Mi
+		{% elif row.day == "4" %}Do
+		{% elif row.day == "5" %}Fr
+		{% elif row.day == "6" %}Sa
+		{% endif %}
+		&nbsp;
+		{{ row.date }}
+            {% endif %}
+        </td>
+        <td>
+            {% if last_time is none or last_time != row.end %}
+                {% set last_time = row.end %}
+                {% if row.begin and row.end %}
+                    {{ row.begin }}–{{ row.end }}
+                {% endif %}
+            {% endif %}
+        </td>
+        <td>
+            {% if last_person is none or last_person != row.person_1 %}
+                {% set last_person = row.person_1 %}
+                {% if row.needs_substitute == "1" %}
+                    <del>{{ row.person_1 }}</del>
+                    {% else %}
+                    {{ row.person_1 }}
+                {% endif %}
+            {% endif %}
+        </td>
+        <td>{{ row.person_2 }}</td>
+        <td>
+            {% if row.extra_begin and row.extra_end %}
+                {{ row.extra_begin }}–{{ row.extra_end }}
+            {% endif %}
+        </td>
+        <td>{% if row.attention %}
+            <b>{{ row.extra_what }}</b>
+            {% else %}
+            {{ row.extra_what }}
+            {% endif %}
+        </td>
+                <td>{{ row.extra_person }}</td>
+            </tr>
+    {% endfor %}
+    </tbody>
 </table>
 
 

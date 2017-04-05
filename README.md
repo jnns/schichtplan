@@ -4,9 +4,9 @@ This script copies schedules from an old MS Access `mdb` file to a Discourse ins
 
 # Installation
 
-Install mdbtools and sqlite3
+Install mdbtools and sqlite3 and the jinja templating engine.
 
-    apt install mdbtools sqlite3
+    apt install mdbtools sqlite3 python-jinja virtualenvwrapper
 
 Add German locale for proper date formatting
 
