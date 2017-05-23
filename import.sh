@@ -28,6 +28,12 @@ NC='\033[0m'
 # Create SQLite3 database beforehand
 # Install using `sudo apt install sqlite3`
 
+echo -e "${GREEN}Cleaning up${NC}"
+rm $SQLITE_OUTPUT
+rm $PAYLOAD
+rm $SQLITE_DATABASE
+rm sql/*  # remove generated sql dumps
+
 # Export schemas of all tables in database file
 echo -e "${GREEN}Exporting schema${NC}"
 mdb-schema $MSACCESS_DATABASE sqlite > sql/schema.sql
@@ -81,11 +87,5 @@ curl -X PUT -F api_username=$API_USER \
   -F api_key=$API_KEY \
   -F post[raw]="`cat $PAYLOAD`" \
   https://intern.ostbloc.de/posts/$POST_ID
-
-echo -e "${GREEN}Cleaning up${NC}"
-rm $SQLITE_OUTPUT
-rm $PAYLOAD
-rm $SQLITE_DATABASE
-rm sql/*  # remove generated sql dumps
 
 echo -e "${GREEN}Done${NC}"
