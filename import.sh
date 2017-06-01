@@ -20,8 +20,6 @@ DATE=`date +"%A %x %X Uhr"`
 # Do not touch the contents below unless you know what you're doing
 
 
-set -e  # abort immediately once a command exits with nonzero return value
-
 GREEN='\033[1;32m'
 NC='\033[0m'
 
