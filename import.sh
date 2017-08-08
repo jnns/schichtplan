@@ -60,6 +60,7 @@ sqlite3 $SQLITE_DATABASE < sql/Ereignis.sql
 
 echo -e "${GREEN}Generate HTML output via SQLite${NC}"
 sqlite3 -batch $SQLITE_DATABASE <<- EOF
+.header on
 .mode tabs
 .output $SQLITE_OUTPUT
 .read schichtplan.sql
